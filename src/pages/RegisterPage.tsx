@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuizActions } from '../store/quizStore';
+import { API_BASE_URL } from '../config';
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
@@ -22,7 +23,7 @@ const RegisterPage = () => {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:3000/api/check-username', {
+            const response = await fetch(`${API_BASE_URL}/api/check-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ const RegisterPage = () => {
         <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
             <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800">Bienvenue au Cyber Quiz</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">Bienvenue au Orange CyberQuiz 2025</h1>
                     <p className="text-gray-600 mt-2">Testez vos connaissances en cybersécurité.</p>
                 </div>
                 <form onSubmit={handleSubmit}>

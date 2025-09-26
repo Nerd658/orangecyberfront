@@ -3,6 +3,7 @@
 // src/store/quizStore.ts
 import { create } from 'zustand';
 import type { Question } from '../data/quizQuestions';
+import { API_BASE_URL } from '../config';
 
 type QuizState = 'idle' | 'active' | 'finished' | 'register';
 
@@ -48,7 +49,7 @@ const useQuizStore = create<StoreState>((set, get) => ({
 
     startQuiz: async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/questions');
+        const response = await fetch(`${API_BASE_URL}/api/questions`);
         const questions = await response.json();
         set({
           questions,
@@ -85,7 +86,7 @@ const useQuizStore = create<StoreState>((set, get) => ({
       const timeInSeconds = Math.round((endTime - time_taken) / 1000);
 
       try {
-        const response = await fetch('http://localhost:3000/api/submit-attempt', {
+        const response = await fetch(`${API_BASE_URL}/api/submit-attempt`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -114,7 +115,7 @@ const useQuizStore = create<StoreState>((set, get) => ({
     submitFinalScore: async () => {
         const { username } = get();
         try {
-            const response = await fetch('http://localhost:3000/api/submit-final', {
+            const response = await fetch(`${API_BASE_URL}/api/submit-final`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username }),

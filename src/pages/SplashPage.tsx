@@ -10,7 +10,7 @@ const SplashPage = () => {
     // Redirige vers la page d'inscription après 4 secondes
     const timer = setTimeout(() => {
       navigate('/register');
-    }, 1000);
+    }, 3000);
 
     // Nettoie le timer si l'utilisateur quitte la page avant la fin
     return () => clearTimeout(timer);
@@ -30,7 +30,7 @@ const SplashPage = () => {
             Mois de la Cyber 2025
         </h1>
         <p className="text-xl md:text-2xl opacity-0 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            Quiz Challenge
+            Orange CyberQuiz Challenge 2025
         </p>
       </div>
     </div>
