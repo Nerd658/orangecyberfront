@@ -1,7 +1,6 @@
 // src/pages/LeaderboardPage.tsx
 import { useEffect, useState } from 'react';
-import { Award, Play, Star } from 'react-feather';
-import { useNavigate } from 'react-router-dom';
+import { Award, Star } from 'react-feather';
 import useQuizStore from '../store/quizStore';
 import { API_BASE_URL } from '../config';
 
@@ -14,7 +13,6 @@ interface Player {
 console.log(API_BASE_URL)
 
 const LeaderboardPage = () => {
-    const navigate = useNavigate();
     const { username } = useQuizStore();
     const [players, setPlayers] = useState<Player[]>([]);
 
