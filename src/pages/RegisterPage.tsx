@@ -56,7 +56,7 @@ const RegisterPage = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-6">
                         <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                            Nom d'utilisateur
+                            Votre CUID
                         </label>
                         <input
                             id="username"
@@ -64,7 +64,7 @@ const RegisterPage = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-3 rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 transition"
-                            placeholder="Entrez votre nom d'utilisateur"
+                            placeholder="Entrez votre cuid "
                             disabled={loading}
                         />
                     </div>
