@@ -11,6 +11,7 @@ interface Player {
     score: number;
     time_taken: number;
 }
+console.log(API_BASE_URL)
 
 const LeaderboardPage = () => {
     const navigate = useNavigate();
@@ -63,13 +64,7 @@ const LeaderboardPage = () => {
                             <span className="block sm:inline sm:ml-1">Orange CyberQuiz 2025</span>
                         </h1>
                     </div>
-                    <button
-                        onClick={() => navigate('/quiz')}
-                        className="w-full sm:w-auto flex items-center justify-center rounded-full bg-orange-500 px-4 sm:px-6 py-2 sm:py-3 font-medium text-white transition-all hover:bg-orange-600 hover:scale-105"
-                    >
-                        <Play size={16} className="mr-2" />
-                        Jouer
-                    </button>
+           
                 </div>
 
                 {/* Leaderboard */}
