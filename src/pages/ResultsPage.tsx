@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useQuizStore, { useQuizActions } from '../store/quizStore';
-import { RefreshCw } from 'react-feather';
+import { RefreshCw, BookOpen, CheckSquare } from 'react-feather';
 
 const ResultsPage = () => {
     const navigate = useNavigate();
-    const { score, time_taken, can_retry, questions } = useQuizStore();
+    const { score, time_taken, can_retry, questions, hasReviewedAnswers, hasSubmitted } = useQuizStore();
     const { resetQuiz, submitFinalScore } = useQuizActions();
     const totalQuestions = questions.length;
     const [loading, setLoading] = useState(false);
@@ -36,10 +36,14 @@ const ResultsPage = () => {
         setLoading(true);
         try {
             await submitFinalScore();
-            navigate('/leaderboard');
+            navigate('/review');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleReview = () => {
+        navigate('/review');
     };
 
     return (
@@ -58,28 +62,44 @@ const ResultsPage = () => {
                             <p className="text-lg text-gray-600">Temps: {time_taken} secondes</p>
                         </div>
 
-                        <div className="text-center">
-                            <button
-                                onClick={handleSubmit}
-                                className="w-full flex justify-center items-center rounded-full bg-blue-500 px-8 py-3 font-medium text-white transition-transform hover:-translate-y-0.5 hover:bg-blue-600 disabled:bg-blue-300"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <>
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Soumission en cours...
-                                    </>
-                                ) : (
-                                    'Soumettre mon score final'
+                        {hasReviewedAnswers ? (
+                            <div className="text-center text-gray-600 bg-gray-100 p-4 rounded-lg">
+                                <CheckSquare className="mx-auto mb-2 h-8 w-8 text-green-500" />
+                                <p>Vous avez consulté la correction pour cet essai.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4 text-center">
+                                {!hasSubmitted && (
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="w-full flex justify-center items-center rounded-full bg-blue-500 px-8 py-3 font-medium text-white transition-transform hover:-translate-y-0.5 hover:bg-blue-600 disabled:bg-blue-300"
+                                        disabled={loading}
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Soumission en cours...
+                                            </>
+                                        ) : (
+                                            'Soumettre mon score final'
+                                        )}
+                                    </button>
                                 )}
-                            </button>
-                        </div>
+                                <button
+                                    onClick={handleReview}
+                                    className="w-full flex justify-center items-center rounded-full bg-gray-200 px-8 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-300"
+                                >
+                                    <BookOpen size={16} className="mr-2" />
+                                    Voir la correction
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
-                {can_retry && (
+                {can_retry && !hasReviewedAnswers && (
                     <div className="text-center">
                         <button
                             onClick={handleRetry}

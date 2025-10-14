@@ -9,7 +9,7 @@ const SplashPage = () => {
   useEffect(() => {
     // Redirige vers la page d'inscription après 4 secondes
     const timer = setTimeout(() => {
-      navigate('/register');
+      navigate('/guide');
     }, 3000);
 
     // Nettoie le timer si l'utilisateur quitte la page avant la fin

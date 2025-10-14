@@ -1,8 +1,8 @@
 
 // src/pages/RegisterPage.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuizActions } from '../store/quizStore';
+import useQuizStore, { useQuizActions } from '../store/quizStore';
 import { API_BASE_URL } from '../config';
 
 const RegisterPage = () => {
@@ -11,6 +11,13 @@ const RegisterPage = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { setUsername: setStoreUsername } = useQuizActions();
+    const { attempts, hasSubmitted } = useQuizStore();
+
+    useEffect(() => {
+        if (hasSubmitted || attempts >= 3) {
+            navigate('/denied');
+        }
+    }, [hasSubmitted, attempts, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

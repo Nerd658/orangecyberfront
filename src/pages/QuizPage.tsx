@@ -2,7 +2,7 @@
 // src/pages/QuizPage.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield } from 'react-feather';
+import { Shield, Clock } from 'react-feather';
 
 import useQuizStore, { useQuizActions } from '../store/quizStore';
 import ProgressBar from '../components/ProgressBar';
@@ -10,8 +10,8 @@ import QuestionCard from '../components/QuestionCard';
 
 const QuizPage = () => {
   const navigate = useNavigate();
-  const { questions, currentQuestionIndex, quizState, username } = useQuizStore();
-  const { startQuiz, goToNextQuestion, selectAnswer } = useQuizActions();
+  const { questions, currentQuestionIndex, quizState, username, timeLeft } = useQuizStore();
+  const { startQuiz, goToNextQuestion, selectAnswer, stopTimer } = useQuizActions();
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,11 @@ const QuizPage = () => {
       return;
     }
     startQuiz();
-  }, [startQuiz, navigate, username]);
+
+    return () => {
+      stopTimer();
+    };
+  }, [startQuiz, navigate, username, stopTimer]);
 
   useEffect(() => {
     if (quizState === 'finished') {
@@ -68,6 +72,12 @@ const QuizPage = () => {
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <header className="border-b border-gray-200 px-4 py-6 md:px-8">
@@ -75,6 +85,10 @@ const QuizPage = () => {
           <div className="flex items-center">
             <Shield className="mr-3 text-3xl text-orange-500" />
             <h1 className="text-2xl font-bold">Quiz Cyber 2025</h1>
+          </div>
+          <div className="flex items-center text-2xl font-bold text-orange-500">
+            <Clock className="mr-2" />
+            {formatTime(timeLeft)}
           </div>
         </div>
       </header>
