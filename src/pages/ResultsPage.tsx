@@ -88,13 +88,7 @@ const ResultsPage = () => {
                                         )}
                                     </button>
                                 )}
-                                <button
-                                    onClick={handleReview}
-                                    className="w-full flex justify-center items-center rounded-full bg-gray-200 px-8 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-300"
-                                >
-                                    <BookOpen size={16} className="mr-2" />
-                                    Voir la correction
-                                </button>
+                               
                             </div>
                         )}
                     </div>
