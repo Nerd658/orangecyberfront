@@ -17,16 +17,17 @@ interface LeaderboardEntry {
 
 const AdminPage = () => {
     const { quizSettings, adminKey } = useQuizStore();
-    const { fetchQuizSettings, updateQuizSettings } = useQuizActions();
+    const actions = useQuizActions();
+    const { fetchAdminQuizSettings, updateQuizSettings } = actions;
     const [participantCount, setParticipantCount] = useState(0);
     const [recentSubmissions, setRecentSubmissions] = useState<Submission[]>([]);
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
     useEffect(() => {
         if (adminKey) {
-            fetchQuizSettings();
+            fetchAdminQuizSettings();
         }
-    }, [adminKey, fetchQuizSettings]);
+    }, [adminKey, fetchAdminQuizSettings]);
 
     useEffect(() => {
         const socket = io(API_BASE_URL);

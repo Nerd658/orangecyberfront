@@ -62,7 +62,10 @@ export function App() {
         <Route
           path="/register"
           element={
-            <ProtectedRoute isAllowed={quizSettings.is_open && !hasSubmitted}>
+            <ProtectedRoute
+              isAllowed={quizSettings.is_open && !hasSubmitted}
+              redirectPath={quizSettings.is_open && hasSubmitted ? '/denied' : '/'}
+            >
               <RegisterPage />
             </ProtectedRoute>
           }
