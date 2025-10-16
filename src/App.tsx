@@ -1,5 +1,6 @@
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import SplashPage from './pages/SplashPage';
 import RegisterPage from './pages/RegisterPage';
 import QuizPage from './pages/QuizPage';
@@ -9,34 +10,84 @@ import DashboardPage from './pages/DashboardPage';
 import GuidePage from './pages/GuidePage';
 import DeniedPage from './pages/DeniedPage';
 import ReviewPage from './pages/ReviewPage';
-import useQuizStore from './store/quizStore';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminPage from './pages/AdminPage';
+import useQuizStore, { useQuizActions } from './store/quizStore';
 
-function App() {
-  const { quizState, hasSubmitted } = useQuizStore();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  isAllowed: boolean;
+  redirectPath?: string;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, isAllowed, redirectPath = '/' }) => {
+  if (!isAllowed) {
+    return <Navigate to={redirectPath} replace />;
+  }
+  return <>{children}</>;
+};
+
+export function App() {
+  const { quizState, hasSubmitted, adminKey, quizSettings } = useQuizStore();
+  const { fetchPublicQuizSettings, fetchAdminQuizSettings } = useQuizActions();
+
+  useEffect(() => {
+    fetchPublicQuizSettings(); // Fetch public settings for all users
+  }, [fetchPublicQuizSettings]);
+
+  useEffect(() => {
+    if (adminKey) {
+      fetchAdminQuizSettings(); // Fetch admin settings only if adminKey is present
+    }
+  }, [adminKey, fetchAdminQuizSettings]);
+
+  if (!quizSettings) {
+    return <div>Loading application settings...</div>;
+  }
 
   return (
     <Router>
       <Routes>
         <Route path="/" element={<SplashPage />} />
-        <Route path="/guide" element={<GuidePage />} />
         <Route path="/denied" element={<DeniedPage />} />
 
-        <Route 
-          path="/register" 
-          element={hasSubmitted ? <Navigate to="/denied" /> : <RegisterPage />} 
+        <Route
+          path="/guide"
+          element={
+            <ProtectedRoute isAllowed={quizSettings.is_open}>
+              <GuidePage />
+            </ProtectedRoute>
+          }
         />
-        <Route 
-          path="/quiz" 
-          element={quizState === 'denied' ? <Navigate to="/denied" /> : <QuizPage />} 
+        <Route
+          path="/register"
+          element={
+            <ProtectedRoute isAllowed={quizSettings.is_open && !hasSubmitted}>
+              <RegisterPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quiz"
+          element={
+            <ProtectedRoute isAllowed={quizSettings.is_open && quizState !== 'denied'}>
+              <QuizPage />
+            </ProtectedRoute>
+          }
         />
 
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route
+          path="/admin"
+          element={adminKey ? <AdminPage /> : <Navigate to="/admin/login" />}
+        />
       </Routes>
     </Router>
   );
 }
-
-export default App;
