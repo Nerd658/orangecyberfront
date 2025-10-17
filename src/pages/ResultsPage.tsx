@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useQuizStore, { useQuizActions } from '../store/quizStore';
-import { RefreshCw, BookOpen, CheckSquare } from 'react-feather';
+import { RefreshCw, CheckSquare } from 'react-feather';
 
 const ResultsPage = () => {
     const navigate = useNavigate();
@@ -42,9 +42,6 @@ const ResultsPage = () => {
         }
     };
 
-    const handleReview = () => {
-        navigate('/review');
-    };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">

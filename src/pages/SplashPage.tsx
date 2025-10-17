@@ -1,54 +1,15 @@
 
 
 
-import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import io from 'socket.io-client'; // Import socket.io-client
-import { API_BASE_URL } from '../config';
-
-interface QuizSettings {
-  is_open: boolean;
-}
+import useQuizStore from '../store/quizStore'; // Import useQuizStore
 
 const SplashPage = () => {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState<QuizSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { quizSettings } = useQuizStore(); // Get quizSettings from store
+  const loading = quizSettings === null; // Determine loading state based on quizSettings
 
-  const fetchSettings = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/settings`);
-      const data = await response.json();
-      setSettings(data);
-    } catch (error) {
-      console.error('Failed to fetch settings', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
-  useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
-
-  // WebSocket logic for real-time updates
-  useEffect(() => {
-    const socket = io(API_BASE_URL);
-
-    socket.on('connect', () => {
-      console.log('Connected to WebSocket server from SplashPage');
-    });
-
-    socket.on('quiz_settings_updated', (updatedSettings) => {
-      console.log('Quiz settings updated via WebSocket:', updatedSettings);
-      setSettings(updatedSettings);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []); // Empty dependency array means this runs once on mount and cleans up on unmount
 
   const renderContent = () => {
     if (loading) {
@@ -62,7 +23,7 @@ const SplashPage = () => {
       );
     }
 
-    if (settings?.is_open) {
+    if (quizSettings?.is_open) {
       return (
         <button
           onClick={() => navigate('/guide')}

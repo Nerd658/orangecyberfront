@@ -18,6 +18,7 @@ import { persist } from 'zustand/middleware';
 import type { Question } from '../data/quizQuestions';
 
 
+import io from 'socket.io-client'; // Import socket.io-client
 import { API_BASE_URL, QUIZ_DURATION_SECONDS } from '../config';
 
 
@@ -159,6 +160,7 @@ interface StoreState {
 
 
         updateQuizSettings: (settings: Partial<QuizSettings>) => Promise<void>;
+        setQuizSettings: (settings: QuizSettings) => void; // New action
 
 
       };
@@ -359,10 +361,22 @@ interface StoreState {
                 set({ quizState: 'idle' }); // Reset state on error
 
 
-              }
+                            }
 
 
-            },
+                          },
+
+
+              
+
+
+                          setQuizSettings: (settings: QuizSettings) => {
+
+
+                            set({ quizSettings: settings });
+
+
+                          },
 
 
     
@@ -807,56 +821,22 @@ interface StoreState {
 
 
             updateQuizSettings: async (settings: Partial<QuizSettings>) => {
-
-
               try {
-
-
                 const response = await fetch(`${API_BASE_URL}/api/admin/settings`, {
-
-
                   method: 'PUT',
-
-
                   headers: {
-
-
                     'Content-Type': 'application/json',
-
-
                     'Authorization': `Bearer ${get().adminKey}`,
-
-
                   },
-
-
                   body: JSON.stringify(settings),
-
-
                 });
-
-
                 if (response.ok) {
-
-
                   const updatedSettings = await response.json();
-
-
                   set({ quizSettings: updatedSettings });
-
-
                 }
-
-
               } catch (error) {
-
-
                 console.error('Failed to update quiz settings:', error);
-
-
               }
-
-
             },
 
 
@@ -875,16 +855,55 @@ interface StoreState {
           storage: storageWithExpiry,
 
 
-                partialize: (state) =>
+                                partialize: (state) => ({
 
 
-                  Object.fromEntries(
+                                    questions: state.questions,
 
 
-                    Object.entries(state).filter(([key]) => !['actions', 'timerId'].includes(key))
+                                    currentQuestionIndex: state.currentQuestionIndex,
 
 
-                  ),
+                                    score: state.score,
+
+
+                                    quizState: state.quizState,
+
+
+                                    username: state.username,
+
+
+                                    answers: state.answers,
+
+
+                                    time_taken: state.time_taken,
+
+
+                                    can_retry: state.can_retry,
+
+
+                                    attempts: state.attempts,
+
+
+                                    hasSubmitted: state.hasSubmitted,
+
+
+                                    hasReviewedAnswers: state.hasReviewedAnswers,
+
+
+                                    timeLeft: state.timeLeft,
+
+
+                                    isSubmitting: state.isSubmitting,
+
+
+                                    adminKey: state.adminKey,
+
+
+                                    quizSettings: state.quizSettings,
+
+
+                                }),
 
 
         }
@@ -893,13 +912,82 @@ interface StoreState {
       )
 
 
-    );
+        );
 
 
     
 
 
-    export const useQuizActions = () => useQuizStore((state) => state.actions);
+        // Initialize WebSocket connection and listeners
+
+
+        let socket: ReturnType<typeof io> | null = null;
+
+
+        useQuizStore.subscribe((state, _prevState) => {
+
+
+          if (!socket) {
+
+
+            socket = io(API_BASE_URL);
+
+
+    
+
+
+            socket.on('connect', () => {
+
+
+              console.log('Connected to WebSocket server from quizStore');
+
+
+            });
+
+
+    
+
+
+            socket.on('quiz_settings_updated', (updatedSettings: QuizSettings) => {
+
+
+              console.log('Quiz settings updated via WebSocket in quizStore:', updatedSettings);
+
+
+              state.actions.setQuizSettings(updatedSettings);
+
+
+            });
+
+
+    
+
+
+            // Clean up on disconnect (optional, depending on desired behavior)
+
+
+            socket.on('disconnect', () => {
+
+
+              console.log('Disconnected from WebSocket server from quizStore');
+
+
+            });
+
+
+          }
+
+
+        });
+
+
+    
+
+
+    
+
+
+        export const useQuizActions = () => useQuizStore((state) => state.actions);
 
 
     export default useQuizStore;

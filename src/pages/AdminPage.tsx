@@ -46,7 +46,7 @@ const AdminPage = () => {
         });
 
         // Real-time update events
-        socket.on('user_registered', (user) => {
+        socket.on('user_registered', (_user) => {
             setParticipantCount(prevCount => prevCount + 1);
         });
 

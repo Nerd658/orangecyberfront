@@ -3,59 +3,41 @@ import { STORAGE_EXPIRATION_HOURS } from '../config';
 const expirationInMs = STORAGE_EXPIRATION_HOURS * 60 * 60 * 1000;
 
 // This is the wrapper object that will be stored in localStorage.
-interface StorageValue {
-  value: string; // This will be the stringified state from Zustand.
+interface StoredData {
+  state: any; // The actual state object
   expiry: number;
 }
 
-/**
- * A custom storage object for Zustand's persist middleware.
- * It wraps the default localStorage to add an expiration date to the stored state.
- */
 export const storageWithExpiry = {
-  /**
-   * Stores the state.
-   * @param name The key to store the state under.
-   * @param value The stringified state from Zustand.
-   */
-  setItem: (name: string, value: string): void => {
-    const wrapper: StorageValue = {
-      value: value,
+  setItem: (name: string, value: any): void => {
+    const storedData: StoredData = {
+      state: value,
       expiry: new Date().getTime() + expirationInMs,
     };
-    localStorage.setItem(name, JSON.stringify(wrapper));
+    localStorage.setItem(name, JSON.stringify(storedData));
   },
 
-  /**
-   * Retrieves the state.
-   * @param name The key of the state to retrieve.
-   * @returns The stringified state if it exists and is not expired, otherwise null.
-   */
-  getItem: (name: string): string | null => {
+  getItem: (name: string): any | null => {
     const storedValue = localStorage.getItem(name);
     if (!storedValue) {
       return null;
     }
 
     try {
-      const wrapper = JSON.parse(storedValue) as StorageValue;
+      const storedData = JSON.parse(storedValue) as StoredData;
       const now = new Date().getTime();
 
-      if (now > wrapper.expiry) {
-        localStorage.removeItem(name); // Clean up expired item.
+      if (now > storedData.expiry) {
+        localStorage.removeItem(name);
         return null;
       }
-      return wrapper.value; // Return the raw string state for Zustand to parse.
+      return storedData.state; // Return the parsed state object
     } catch (error) {
       console.error("Failed to parse stored state.", error);
       return null;
     }
   },
 
-  /**
-   * Removes an item from storage.
-   * @param name The key of the item to remove.
-   */
   removeItem: (name: string): void => {
     localStorage.removeItem(name);
   },
